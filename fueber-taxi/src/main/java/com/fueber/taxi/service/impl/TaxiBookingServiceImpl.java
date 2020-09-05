@@ -37,6 +37,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 
 	@Override
 	public CustomerVO bookTaxi(CustomerVO customerVO) throws TaxiServiceException {
+		taxiBookingValidationService.validateCustomerOnRideAlready(customerVO.getMobileNumber(), onRideCustomerList);
 		taxiBookingValidationService.validateCustomerPickupLocation(customerVO.getPickupLatitude(), customerVO.getPickupLongitude());
 		taxiBookingValidationService.validateCustomerDropLocation(customerVO.getDropLatitude(), customerVO.getDropLongitude());
 		TaxiDTO nearByTaxiDTO = getNearestTaxi(customerVO.getPickupLatitude(), customerVO.getPickupLongitude());

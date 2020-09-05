@@ -1,6 +1,8 @@
 package com.fueber.taxi.service.impl;
 
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fueber.taxi.common.Constants;
+import com.fueber.taxi.dto.CustomerDTO;
 import com.fueber.taxi.exception.TaxiServiceException;
 import com.fueber.taxi.service.TaxiBookingValidationService;
 import com.fueber.taxi.util.FueberTaxiUtils;
@@ -27,7 +30,7 @@ public class TaxiBookingValidationServiceImpl implements TaxiBookingValidationSe
 	
 	@Autowired
 	private Properties errorProperties;
-
+	
 	@Override
 	public void validateCustomerPickupLocation(double latitude, double longitude) throws TaxiServiceException {
 		int distanceBetweenPoints = getDistanceBetweenTwoPoints(latitude, longitude);
@@ -41,6 +44,14 @@ public class TaxiBookingValidationServiceImpl implements TaxiBookingValidationSe
 		int distanceBetweenPoints = getDistanceBetweenTwoPoints(latitude, longitude);
 		if(distanceBetweenPoints > Integer.parseInt(baseKilometerLimit)) {
 			throwTaxiServiceException(Constants.SERVICE_UNAVAILABLE_AT_DROP_LOCATION);
+		}
+	}
+	
+	@Override
+	public void validateCustomerOnRideAlready(String customerMobileNumber, List<CustomerDTO> onRideCustomerList) throws TaxiServiceException {
+		Optional<CustomerDTO> optionalCustomerDTO = onRideCustomerList.stream().filter(customerDTO -> customerDTO.getCustomerMobileNumber().equals(customerMobileNumber)).findAny();
+		if(optionalCustomerDTO.isPresent()) {
+			throwTaxiServiceException(Constants.CUSTOMER_ALREADY_ON_RIDE, customerMobileNumber);
 		}
 	}
 	

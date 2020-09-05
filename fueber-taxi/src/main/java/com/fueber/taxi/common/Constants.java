@@ -11,4 +11,6 @@ public class Constants {
 	public static final String SERVICE_UNAVAILABLE_AT_DROP_LOCATION = "400101";
 	
 	public static final String TAXI_NOT_AVAILABLE_AT_PICKUP_LOCATION = "400102";
+	
+	public static final String CUSTOMER_ALREADY_ON_RIDE = "400103";
 }
