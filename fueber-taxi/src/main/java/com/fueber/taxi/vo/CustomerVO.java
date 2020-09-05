@@ -44,6 +44,18 @@ public class CustomerVO {
 	@JsonProperty(value = "status", required = false)
 	private String rideStatus;
 	
+	@JsonProperty(value = "bookingId", required = false)
+	private String bookingId;
+	
+	@JsonProperty(value = "startTime", required = false)
+	private String startTime;
+	
+	@JsonProperty(value = "endTime", required = false)
+	private String endTime;
+	
+	@JsonProperty(value = "rideCharges", required = false)
+	private int rideCharges;
+	
 	public String getMobileNumber() {
 		return mobileNumber;
 	}
@@ -115,13 +127,46 @@ public class CustomerVO {
 	public void setRideStatus(String rideStatus) {
 		this.rideStatus = rideStatus;
 	}
+	
+	public String getBookingId() {
+		return bookingId;
+	}
+
+	public void setBookingId(String bookingId) {
+		this.bookingId = bookingId;
+	}
+	
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+	
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+	
+	public int getRideCharges() {
+		return rideCharges;
+	}
+
+	public void setRideCharges(int rideCharges) {
+		this.rideCharges = rideCharges;
+	}
 
 	@Override
 	public String toString() {
 		return "CustomerVO [mobileNumber=" + mobileNumber + ", pickupLatitude=" + pickupLatitude + ", pickupLongitude="
 				+ pickupLongitude + ", dropLatitude=" + dropLatitude + ", dropLongitude=" + dropLongitude
 				+ ", isPinkTaxi=" + isPinkTaxi + ", taxiId=" + taxiId + ", distance=" + distance + ", rideStatus="
-				+ rideStatus + "]";
+				+ rideStatus + ", bookingId=" + bookingId + ", startTime=" + startTime + ", endTime=" + endTime
+				+ ", rideCharges=" + rideCharges + "]";
 	}
 
 }

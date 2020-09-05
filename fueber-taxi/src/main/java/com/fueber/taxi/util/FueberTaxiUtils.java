@@ -1,13 +1,19 @@
 package com.fueber.taxi.util;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
+
+import com.fueber.taxi.common.Constants;
 
 public class FueberTaxiUtils {
 	
 	private FueberTaxiUtils() {
 		
 	}
+	
+	private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT);
 
 	/**Method to load the properties*/
 	public static Properties loadProperties(String propertyFilename) {
@@ -34,5 +40,10 @@ public class FueberTaxiUtils {
 		double angularDistanceInRadians = 2 * Math.atan2(Math.sqrt(squareOfHalfLength), Math.sqrt(1-squareOfHalfLength));
 		double distanceInKMS = (radiusOfEarth * angularDistanceInRadians)/1000;
 		return (int)Math.round(distanceInKMS);
+	}
+	
+	/**Method to convert the valid local date time to string*/
+	public static String formatDateToString(LocalDateTime localDateTime) {
+		return localDateTime.format(dateTimeFormatter);
 	}
 }

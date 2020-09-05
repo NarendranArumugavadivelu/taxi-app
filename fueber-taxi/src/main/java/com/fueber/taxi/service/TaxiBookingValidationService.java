@@ -15,4 +15,12 @@ public interface TaxiBookingValidationService {
 	public void validateCustomerDropLocation(double latitude, double longitude) throws TaxiServiceException;
 	
 	public void validateCustomerOnRideAlready(String customerMobileNumber, List<CustomerDTO> onRideCustomerList) throws TaxiServiceException;
+	
+	public void validateRideStatus(String rideStatus) throws TaxiServiceException;
+	
+	public void validateStartRide(String status, String currentStatus) throws TaxiServiceException;
+	
+	public void validateCancelRide(String status, String currentStatus) throws TaxiServiceException;
+	
+	public void validateCompleteRide(String status, String currentStatus) throws TaxiServiceException;
 }

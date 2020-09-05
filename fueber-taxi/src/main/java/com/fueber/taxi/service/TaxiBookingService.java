@@ -8,5 +8,7 @@ import com.fueber.taxi.vo.CustomerVO;
 @Service
 public interface TaxiBookingService {
 
-	public CustomerVO bookTaxi(CustomerVO customerVO) throws TaxiServiceException;
+	public CustomerVO bookRide(CustomerVO customerVO) throws TaxiServiceException;
+	
+	public CustomerVO updateRide(CustomerVO customerVO, String bookingId) throws TaxiServiceException; 
 }

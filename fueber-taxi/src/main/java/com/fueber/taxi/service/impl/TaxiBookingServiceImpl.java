@@ -1,7 +1,12 @@
 package com.fueber.taxi.service.impl;
 
+import java.text.MessageFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,18 +40,25 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 	
 	@Autowired
 	private Properties errorProperties;
+	
+	@Value("${fueber.taxi.base.ratePerMinute}")
+	private String baseRatePerMinute;
+	
+	@Value("${fueber.taxi.base.ratePerKilometer}")
+	private String baseRatePerKilometer;
 
 	@Override
-	public CustomerVO bookTaxi(CustomerVO customerVO) throws TaxiServiceException {
+	public CustomerVO bookRide(CustomerVO customerVO) throws TaxiServiceException {
 		taxiBookingValidationService.validateCustomerOnRideAlready(customerVO.getMobileNumber(), onRideCustomerList);
 		taxiBookingValidationService.validateCustomerPickupLocation(customerVO.getPickupLatitude(), customerVO.getPickupLongitude());
 		taxiBookingValidationService.validateCustomerDropLocation(customerVO.getDropLatitude(), customerVO.getDropLongitude());
 		TaxiDTO nearByTaxiDTO = getNearestTaxi(customerVO.getPickupLatitude(), customerVO.getPickupLongitude(), customerVO.isPinkTaxi());
 		if(nearByTaxiDTO != null) {
-			updateTaxiDTO(nearByTaxiDTO, true);
+			updateTaxiDTO(nearByTaxiDTO.getTaxiID(), true);
 			CustomerDTO customerDTO = getCustomerDTOByVO(customerVO);
 			customerDTO.setTaxiID(nearByTaxiDTO.getTaxiID());
 			customerDTO.setStatus(RideStatus.BOOKED.getStatus());
+			customerDTO.setBookingId(UUID.randomUUID().toString());
 			onRideCustomerList.add(customerDTO);
 			return getCustomerVOByDTO(customerDTO);
 		} else {
@@ -55,6 +67,46 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 			errorVO.setErrorCode(Constants.TAXI_NOT_AVAILABLE_AT_PICKUP_LOCATION);
 			errorVO.setErrorMessage(message);
 			throw new TaxiServiceException(message, errorVO);
+		}
+	}
+	
+	@Override
+	public CustomerVO updateRide(CustomerVO customerVO, String bookingId) throws TaxiServiceException {
+		CustomerDTO customerDTO = getCustomerDTOByBookingId(bookingId);
+		taxiBookingValidationService.validateRideStatus(customerVO.getRideStatus());
+		if(customerVO.getRideStatus().equals(customerDTO.getStatus())) {
+			throwTaxiServiceException(Constants.DUPLICATE_RIDE_STATUS, customerVO.getRideStatus());
+		} 
+		if(RideStatus.STARTED.getStatus().equals(customerVO.getRideStatus())) {
+			taxiBookingValidationService.validateStartRide(customerVO.getRideStatus(), customerDTO.getStatus());
+			customerDTO.setStartTime(LocalDateTime.now());
+		} else if(RideStatus.CANCELED.getStatus().equals(customerVO.getRideStatus())) {
+			taxiBookingValidationService.validateCancelRide(customerVO.getRideStatus(), customerDTO.getStatus());
+			updateTaxiDTO(customerDTO.getTaxiID(), false);
+		} else if(RideStatus.COMPLETED.getStatus().equals(customerVO.getRideStatus())) {
+			taxiBookingValidationService.validateCancelRide(customerVO.getRideStatus(), customerDTO.getStatus());
+			updateTaxiDTO(customerDTO.getTaxiID(), false);
+			customerDTO.setEndTime(LocalDateTime.now());
+			int rideInMinutes = (int)Duration.between(customerDTO.getEndTime(), customerDTO.getStartTime()).toMinutes();
+			int rideCharges = (rideInMinutes * Integer.parseInt(baseRatePerMinute)) + (customerDTO.getDistance() * Integer.parseInt(baseRatePerKilometer));
+			customerDTO.setRideCharges(rideCharges);
+		}
+		customerDTO.setStatus(customerVO.getRideStatus());
+		updateOnRideCustomerList(customerDTO);
+		return getCustomerVOByDTO(customerDTO);
+	}
+	
+	
+	/**Method to update the customer booking details based on status*/
+	private void updateOnRideCustomerList(CustomerDTO customerDTO) {
+		for(CustomerDTO onRideCustomerDTO : onRideCustomerList) {
+			if(customerDTO.getBookingId().equals(onRideCustomerDTO.getBookingId())) {
+				onRideCustomerDTO.setStartTime(customerDTO.getStartTime());
+				onRideCustomerDTO.setEndTime(customerDTO.getEndTime());
+				onRideCustomerDTO.setStatus(customerDTO.getStatus());
+				onRideCustomerDTO.setRideCharges(customerDTO.getRideCharges());
+				break;
+			}
 		}
 	}
 	
@@ -73,9 +125,9 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 	}
 	
 	/**Method to update the taxi by assigning to customer or free the taxi*/
-	private void updateTaxiDTO(TaxiDTO taxiDTO, boolean isAssignedToCustomer) {
+	private void updateTaxiDTO(String taxiID, boolean isAssignedToCustomer) {
 		for(TaxiDTO availableTaxiDTO : availableTaxiList) {
-			if(availableTaxiDTO.getTaxiID().equalsIgnoreCase(taxiDTO.getTaxiID())) {
+			if(availableTaxiDTO.getTaxiID().equalsIgnoreCase(taxiID)) {
 				availableTaxiDTO.setAssignedToCustomer(isAssignedToCustomer);
 			}
 		}
@@ -107,6 +159,35 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 		customerVO.setTaxiId(customerDTO.getTaxiID());
 		customerVO.setDistance(customerDTO.getDistance());
 		customerVO.setRideStatus(customerDTO.getStatus());
+		customerVO.setBookingId(customerDTO.getBookingId());
+		if(customerDTO.getStartTime() != null) {
+			customerVO.setStartTime(FueberTaxiUtils.formatDateToString(customerDTO.getStartTime()));
+		}
+		if(customerDTO.getEndTime() != null) {
+			customerVO.setEndTime(FueberTaxiUtils.formatDateToString(customerDTO.getEndTime()));
+		}
+		customerVO.setRideCharges(customerDTO.getRideCharges());
 		return customerVO;
 	}
+	
+	/**Method to get the customer and booking details by booking id*/
+	private CustomerDTO getCustomerDTOByBookingId(String bookingId) throws TaxiServiceException {
+		Optional<CustomerDTO> optionalCustomerDTO = onRideCustomerList.stream().filter(customerDTO -> customerDTO.getBookingId().equals(bookingId)).findAny();
+		if(!optionalCustomerDTO.isPresent()) {
+			throwTaxiServiceException(Constants.BOOKING_ID_DOES_NOT_EXISTS, bookingId);
+		} 
+		return optionalCustomerDTO.get();
+	}
+	
+	private void throwTaxiServiceException(String code, Object ... arguments) throws TaxiServiceException {
+		String message = errorProperties.getProperty(code);
+		if(arguments != null && arguments.length > 0) {
+			message = MessageFormat.format(message, arguments);
+		}
+		ErrorVO errorVO = new ErrorVO();
+		errorVO.setErrorCode(code);
+		errorVO.setErrorMessage(message);
+		throw new TaxiServiceException(message, errorVO);
+	}
+	
 }

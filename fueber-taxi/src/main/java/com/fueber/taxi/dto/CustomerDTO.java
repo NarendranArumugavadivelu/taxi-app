@@ -25,6 +25,10 @@ public class CustomerDTO {
 	private LocalDateTime endTime;
 	
 	private String status;
+	
+	private String bookingId;
+	
+	private int rideCharges;
 
 	public String getCustomerMobileNumber() {
 		return customerMobileNumber;
@@ -113,13 +117,30 @@ public class CustomerDTO {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	
+	public String getBookingId() {
+		return bookingId;
+	}
+
+	public void setBookingId(String bookingId) {
+		this.bookingId = bookingId;
+	}
+	
+	public int getRideCharges() {
+		return rideCharges;
+	}
+
+	public void setRideCharges(int rideCharges) {
+		this.rideCharges = rideCharges;
+	}
 
 	@Override
 	public String toString() {
 		return "CustomerDTO [customerMobileNumber=" + customerMobileNumber + ", pickupLatitude=" + pickupLatitude
 				+ ", pickupLongitude=" + pickupLongitude + ", dropLatitude=" + dropLatitude + ", dropLongitude="
-				+ dropLongitude + ", taxiID=" + taxiID + ", isPinkTaxi=" + isPinkTaxi + ", distanceInKms="
-				+ distance + ", startTime=" + startTime + ", endTime=" + endTime + "]";
+				+ dropLongitude + ", taxiID=" + taxiID + ", isPinkTaxi=" + isPinkTaxi + ", distance=" + distance
+				+ ", startTime=" + startTime + ", endTime=" + endTime + ", status=" + status + ", bookingId="
+				+ bookingId + "]";
 	}
 
 }
