@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomerVO {
@@ -14,46 +16,59 @@ public class CustomerVO {
 	@JsonProperty(value = "mobileNumber")
 	@NotNull(message = "{customer.mobileNumber.notNull}")
 	@Pattern(regexp = "^[6-9]\\d{9}$", message = "{customer.mobileNumber.invalid}")
+	@Schema(description = "Customer mobile number which is a required parameter for all operations", type = "String")
 	private String mobileNumber;
 	
 	@JsonProperty(value = "pickupLatitude")
 	@NotNull(message = "{customer.pickupLatitude.notNull}")
+	@Schema(description = "Latitude of the pickup location", type = "number", format = "double")
 	private Double pickupLatitude;
 	
 	@JsonProperty(value = "pickupLongitude")
 	@NotNull(message = "{customer.pickupLongitude.notNull}")
+	@Schema(description = "Longitude of the pickup location", type = "number", format = "double")
 	private Double pickupLongitude;
 	
 	@JsonProperty(value = "dropLatitude")
 	@NotNull(message = "{customer.dropLatitude.notNull}")
+	@Schema(description = "Latitude of the destination location", type = "number", format = "double")
 	private Double dropLatitude;
 	
 	@JsonProperty(value = "dropLongitude")
 	@NotNull(message = "{customer.dropLongitude.notNull}")
+	@Schema(description = "Longitude of the destination location", type = "number", format = "double")
 	private Double dropLongitude;
 	
 	@JsonProperty(value = "pinkTaxi", required = false)
+	@Schema(description = "Customer requires pink taxi or not", type = "boolean")
 	private boolean isPinkTaxi;
 	
 	@JsonProperty(value = "taxiId", required = false)
+	@Schema(description = "The assigned taxi id for the customer", type = "string")
 	private String taxiId;
 	
 	@JsonProperty(value = "distance", required = false)
+	@Schema(description = "The distance in kilometers between the source and destination", type = "integer", format = "int64")
 	private int distance;
 	
 	@JsonProperty(value = "status", required = false)
+	@Schema(description = "The status of the ride", type = "string")
 	private String rideStatus;
 	
 	@JsonProperty(value = "bookingId", required = false)
+	@Schema(description = "The unique booking id of the ride", type = "string")
 	private String bookingId;
 	
 	@JsonProperty(value = "startTime", required = false)
+	@Schema(description = "The time when the ride started", type = "string")
 	private String startTime;
 	
 	@JsonProperty(value = "endTime", required = false)
+	@Schema(description = "The time when the ride completed", type = "string")
 	private String endTime;
 	
 	@JsonProperty(value = "rideCharges", required = false)
+	@Schema(description = "The charges for the ride", type = "integer", format = "int64")
 	private int rideCharges;
 	
 	public String getMobileNumber() {

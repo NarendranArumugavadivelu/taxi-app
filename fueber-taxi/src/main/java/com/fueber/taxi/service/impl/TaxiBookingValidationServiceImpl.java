@@ -51,7 +51,7 @@ public class TaxiBookingValidationServiceImpl implements TaxiBookingValidationSe
 	
 	@Override
 	public void validateRideStatus(String rideStatus) throws TaxiServiceException {
-		if(Arrays.stream(RideStatus.values()).noneMatch(x -> x.getStatus().equals(rideStatus))) {
+		if(Arrays.stream(RideStatus.values()).noneMatch(x -> x.getStatus().equalsIgnoreCase(rideStatus))) {
 			throwTaxiServiceException(Constants.INVALID_RIDE_STATUS, rideStatus);
 		}
 	}

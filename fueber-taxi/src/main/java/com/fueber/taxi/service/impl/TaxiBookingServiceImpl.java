@@ -89,6 +89,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 			customerDTO.setEndTime(LocalDateTime.now());
 			int rideInMinutes = (int)Duration.between(customerDTO.getEndTime(), customerDTO.getStartTime()).toMinutes();
 			int rideCharges = (rideInMinutes * Integer.parseInt(baseRatePerMinute)) + (customerDTO.getDistance() * Integer.parseInt(baseRatePerKilometer));
+			rideCharges += customerDTO.isPinkTaxi() ? 5 : 0;
 			customerDTO.setRideCharges(rideCharges);
 		}
 		customerDTO.setStatus(customerVO.getRideStatus());

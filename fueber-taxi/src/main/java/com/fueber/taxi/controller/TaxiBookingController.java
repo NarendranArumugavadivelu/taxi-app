@@ -43,8 +43,8 @@ public class TaxiBookingController {
 	}
 	
 	@PutMapping(path = "/{bookingId}", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-	@Operation(summary = "Updating the ride with status started", 
-			   description = "Update an already persisted ride for the customer with status started",
+	@Operation(summary = "Updating the ride with any one of the following statuses started, canceled or completed", 
+			   description = "Update an already persisted ride for the customer with the following statuses started, canceled or completed",
 			   parameters = @Parameter(name = "bookingId", in = ParameterIn.PATH, description = "Booking id of the ride to update", required = true, 
 			   schema = @Schema(type = "string", format = "uuid")))
 	@ApiResponses(value = {
