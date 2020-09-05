@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,19 +25,12 @@ import com.fueber.taxi.vo.ErrorVO;
 @Service
 public class TaxiBookingServiceImpl implements TaxiBookingService {
 	
-	@Autowired
 	private TaxiBookingValidationService taxiBookingValidationService;
 	
-	@Autowired
 	private List<TaxiDTO> availableTaxiList;
 	
-	@Autowired
 	private List<CustomerDTO> bookedCustomerList;
 	
-	@Value("${fueber.taxi.base.kilometerLimit}")
-	private String baseKilometerLimit;
-	
-	@Autowired
 	private Properties errorProperties;
 	
 	@Value("${fueber.taxi.base.ratePerMinute}")
@@ -46,7 +38,20 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 	
 	@Value("${fueber.taxi.base.ratePerKilometer}")
 	private String baseRatePerKilometer;
-
+	
+	@Value("${fueber.taxi.base.kilometerLimit}")
+	private String baseKilometerLimit;
+	
+	@Value("${fueber.taxi.base.pinkTaxiCharge}")
+	private String pinkTaxiCharge;
+	
+	public TaxiBookingServiceImpl(TaxiBookingValidationService taxiBookingValidationService, List<TaxiDTO> availableTaxiList, List<CustomerDTO> bookedCustomerList, Properties errorProperties) {
+		this.taxiBookingValidationService = taxiBookingValidationService;
+		this.availableTaxiList = availableTaxiList;
+		this.bookedCustomerList = bookedCustomerList;
+		this.errorProperties = errorProperties;
+	}
+	
 	@Override
 	public CustomerVO bookRide(CustomerVO customerVO) throws TaxiServiceException {
 		taxiBookingValidationService.validateCustomerOnRideAlready(customerVO.getMobileNumber(), bookedCustomerList);
@@ -89,7 +94,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 			customerDTO.setEndTime(LocalDateTime.now());
 			int rideInMinutes = (int)Duration.between(customerDTO.getEndTime(), customerDTO.getStartTime()).toMinutes();
 			int rideCharges = (rideInMinutes * Integer.parseInt(baseRatePerMinute)) + (customerDTO.getDistance() * Integer.parseInt(baseRatePerKilometer));
-			rideCharges += customerDTO.isPinkTaxi() ? 5 : 0;
+			rideCharges += customerDTO.isPinkTaxi() ? Integer.parseInt(pinkTaxiCharge) : 0;
 			customerDTO.setRideCharges(rideCharges);
 		}
 		customerDTO.setStatus(customerVO.getRideStatus());
@@ -116,10 +121,12 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 		TaxiDTO nearByTaxiDTO = null;
 		int nearestTaxiDistance = Integer.parseInt(baseKilometerLimit) + 1; //Search is within base kilometer + 1
 		for(TaxiDTO taxiDTO : availableTaxiList) {
-			int distanceBetweenTwoPoints = FueberTaxiUtils.getDistanceBetweenPoints(pickupLatitude, pickLongitude, taxiDTO.getLatitude(), taxiDTO.getLongitude());
-			if(distanceBetweenTwoPoints < nearestTaxiDistance && !taxiDTO.isAssignedToCustomer() && String.valueOf(isPinkTaxi).equalsIgnoreCase(String.valueOf(taxiDTO.isPinkTaxi()))) {
-				nearByTaxiDTO = taxiDTO;
-				nearestTaxiDistance = distanceBetweenTwoPoints;
+			if(!taxiDTO.isAssignedToCustomer()) {
+				int distanceBetweenTwoPoints = FueberTaxiUtils.getDistanceBetweenPoints(pickupLatitude, pickLongitude, taxiDTO.getLatitude(), taxiDTO.getLongitude());
+				if(distanceBetweenTwoPoints < nearestTaxiDistance && String.valueOf(isPinkTaxi).equalsIgnoreCase(String.valueOf(taxiDTO.isPinkTaxi()))) {
+					nearByTaxiDTO = taxiDTO;
+					nearestTaxiDistance = distanceBetweenTwoPoints;
+				}
 			}
 		}
 		return nearByTaxiDTO;

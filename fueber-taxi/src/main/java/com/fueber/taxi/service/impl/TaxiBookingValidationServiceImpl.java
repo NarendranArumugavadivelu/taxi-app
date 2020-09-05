@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +29,11 @@ public class TaxiBookingValidationServiceImpl implements TaxiBookingValidationSe
 	@Value("${fueber.taxi.base.kilometerLimit}")
 	private String baseKilometerLimit;
 	
-	@Autowired
 	private Properties errorProperties;
+	
+	public TaxiBookingValidationServiceImpl(Properties errorProperties) {
+		this.errorProperties = errorProperties;
+	}
 	
 	@Override
 	public void validateCustomerPickupLocation(double latitude, double longitude) throws TaxiServiceException {
