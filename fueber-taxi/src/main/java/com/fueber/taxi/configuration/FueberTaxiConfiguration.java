@@ -28,7 +28,7 @@ public class FueberTaxiConfiguration {
 		return taxiDTOs;
 	}
 	
-	@Bean(name = "onRideCustomerList")
+	@Bean(name = "bookedCustomerList")
 	public List<CustomerDTO> createOnRideCustomerList() {
 		return new ArrayList<>();
 	}

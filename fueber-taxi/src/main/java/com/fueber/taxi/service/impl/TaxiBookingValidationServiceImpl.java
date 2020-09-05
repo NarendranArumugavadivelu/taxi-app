@@ -59,7 +59,7 @@ public class TaxiBookingValidationServiceImpl implements TaxiBookingValidationSe
 	@Override
 	public void validateCustomerOnRideAlready(String customerMobileNumber, List<CustomerDTO> onRideCustomerList) throws TaxiServiceException {
 		Optional<CustomerDTO> optionalCustomerDTO = onRideCustomerList.stream().filter(customerDTO -> customerDTO.getCustomerMobileNumber().equals(customerMobileNumber)).findAny();
-		if(optionalCustomerDTO.isPresent() && (optionalCustomerDTO.get().getStatus().equals(RideStatus.STARTED.getStatus()) || optionalCustomerDTO.get().getStatus().equals(RideStatus.BOOKED.getStatus()))) {
+		if(optionalCustomerDTO.isPresent() && (optionalCustomerDTO.get().getStatus().equalsIgnoreCase(RideStatus.STARTED.getStatus()) || optionalCustomerDTO.get().getStatus().equalsIgnoreCase(RideStatus.BOOKED.getStatus()))) {
 			throwTaxiServiceException(Constants.CUSTOMER_ALREADY_ON_RIDE, customerMobileNumber);
 		}
 	}
@@ -90,7 +90,7 @@ public class TaxiBookingValidationServiceImpl implements TaxiBookingValidationSe
 
 	@Override
 	public void validateCancelRide(String status, String currentStatus) throws TaxiServiceException {
-		if(RideStatus.STARTED.getStatus().equals(currentStatus)) {
+		if(RideStatus.STARTED.getStatus().equalsIgnoreCase(currentStatus)) {
 			throwTaxiServiceException(Constants.RIDE_ALREADY_STARTED);
 		} else if(currentStatus.equalsIgnoreCase(RideStatus.COMPLETED.getStatus())) {
 			throwTaxiServiceException(Constants.RIDE_STATUS_CANNOT_BE_UPDATED, status, currentStatus);
@@ -99,7 +99,7 @@ public class TaxiBookingValidationServiceImpl implements TaxiBookingValidationSe
 
 	@Override
 	public void validateCompleteRide(String status, String currentStatus) throws TaxiServiceException {
-		if(!RideStatus.STARTED.getStatus().equals(currentStatus)) {
+		if(!RideStatus.STARTED.getStatus().equalsIgnoreCase(currentStatus)) {
 			throwTaxiServiceException(Constants.RIDE_NOT_STARTED_YET);
 		} else if(currentStatus.equalsIgnoreCase(RideStatus.CANCELED.getStatus())) {
 			throwTaxiServiceException(Constants.RIDE_STATUS_CANNOT_BE_UPDATED, status, currentStatus);

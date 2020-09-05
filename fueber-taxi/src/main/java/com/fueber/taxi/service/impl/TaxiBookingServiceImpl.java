@@ -33,7 +33,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 	private List<TaxiDTO> availableTaxiList;
 	
 	@Autowired
-	private List<CustomerDTO> onRideCustomerList;
+	private List<CustomerDTO> bookedCustomerList;
 	
 	@Value("${fueber.taxi.base.kilometerLimit}")
 	private String baseKilometerLimit;
@@ -49,7 +49,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 
 	@Override
 	public CustomerVO bookRide(CustomerVO customerVO) throws TaxiServiceException {
-		taxiBookingValidationService.validateCustomerOnRideAlready(customerVO.getMobileNumber(), onRideCustomerList);
+		taxiBookingValidationService.validateCustomerOnRideAlready(customerVO.getMobileNumber(), bookedCustomerList);
 		taxiBookingValidationService.validateCustomerPickupLocation(customerVO.getPickupLatitude(), customerVO.getPickupLongitude());
 		taxiBookingValidationService.validateCustomerDropLocation(customerVO.getDropLatitude(), customerVO.getDropLongitude());
 		TaxiDTO nearByTaxiDTO = getNearestTaxi(customerVO.getPickupLatitude(), customerVO.getPickupLongitude(), customerVO.isPinkTaxi());
@@ -59,7 +59,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 			customerDTO.setTaxiID(nearByTaxiDTO.getTaxiID());
 			customerDTO.setStatus(RideStatus.BOOKED.getStatus());
 			customerDTO.setBookingId(UUID.randomUUID().toString());
-			onRideCustomerList.add(customerDTO);
+			bookedCustomerList.add(customerDTO);
 			return getCustomerVOByDTO(customerDTO);
 		} else {
 			String message = errorProperties.getProperty(Constants.TAXI_NOT_AVAILABLE_AT_PICKUP_LOCATION);
@@ -74,17 +74,17 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 	public CustomerVO updateRide(CustomerVO customerVO, String bookingId) throws TaxiServiceException {
 		CustomerDTO customerDTO = getCustomerDTOByBookingId(bookingId);
 		taxiBookingValidationService.validateRideStatus(customerVO.getRideStatus());
-		if(customerVO.getRideStatus().equals(customerDTO.getStatus())) {
+		if(customerVO.getRideStatus().equalsIgnoreCase(customerDTO.getStatus())) {
 			throwTaxiServiceException(Constants.DUPLICATE_RIDE_STATUS, customerVO.getRideStatus());
 		} 
-		if(RideStatus.STARTED.getStatus().equals(customerVO.getRideStatus())) {
+		if(RideStatus.STARTED.getStatus().equalsIgnoreCase(customerVO.getRideStatus())) {
 			taxiBookingValidationService.validateStartRide(customerVO.getRideStatus(), customerDTO.getStatus());
 			customerDTO.setStartTime(LocalDateTime.now());
-		} else if(RideStatus.CANCELED.getStatus().equals(customerVO.getRideStatus())) {
+		} else if(RideStatus.CANCELED.getStatus().equalsIgnoreCase(customerVO.getRideStatus())) {
 			taxiBookingValidationService.validateCancelRide(customerVO.getRideStatus(), customerDTO.getStatus());
 			updateTaxiDTO(customerDTO.getTaxiID(), false);
-		} else if(RideStatus.COMPLETED.getStatus().equals(customerVO.getRideStatus())) {
-			taxiBookingValidationService.validateCancelRide(customerVO.getRideStatus(), customerDTO.getStatus());
+		} else if(RideStatus.COMPLETED.getStatus().equalsIgnoreCase(customerVO.getRideStatus())) {
+			taxiBookingValidationService.validateCompleteRide(customerVO.getRideStatus(), customerDTO.getStatus());
 			updateTaxiDTO(customerDTO.getTaxiID(), false);
 			customerDTO.setEndTime(LocalDateTime.now());
 			int rideInMinutes = (int)Duration.between(customerDTO.getEndTime(), customerDTO.getStartTime()).toMinutes();
@@ -99,7 +99,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 	
 	/**Method to update the customer booking details based on status*/
 	private void updateOnRideCustomerList(CustomerDTO customerDTO) {
-		for(CustomerDTO onRideCustomerDTO : onRideCustomerList) {
+		for(CustomerDTO onRideCustomerDTO : bookedCustomerList) {
 			if(customerDTO.getBookingId().equals(onRideCustomerDTO.getBookingId())) {
 				onRideCustomerDTO.setStartTime(customerDTO.getStartTime());
 				onRideCustomerDTO.setEndTime(customerDTO.getEndTime());
@@ -172,7 +172,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 	
 	/**Method to get the customer and booking details by booking id*/
 	private CustomerDTO getCustomerDTOByBookingId(String bookingId) throws TaxiServiceException {
-		Optional<CustomerDTO> optionalCustomerDTO = onRideCustomerList.stream().filter(customerDTO -> customerDTO.getBookingId().equals(bookingId)).findAny();
+		Optional<CustomerDTO> optionalCustomerDTO = bookedCustomerList.stream().filter(customerDTO -> customerDTO.getBookingId().equals(bookingId)).findAny();
 		if(!optionalCustomerDTO.isPresent()) {
 			throwTaxiServiceException(Constants.BOOKING_ID_DOES_NOT_EXISTS, bookingId);
 		} 
