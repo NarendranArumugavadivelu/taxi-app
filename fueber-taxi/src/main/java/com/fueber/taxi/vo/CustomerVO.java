@@ -60,11 +60,11 @@ public class CustomerVO {
 	private String bookingId;
 	
 	@JsonProperty(value = "startTime", required = false)
-	@Schema(description = "The time when the ride started", type = "string")
+	@Schema(description = "The time when the ride started", type = "string", format = "date-time", example = "2019-10-30T12:34:23Z")
 	private String startTime;
 	
 	@JsonProperty(value = "endTime", required = false)
-	@Schema(description = "The time when the ride completed", type = "string")
+	@Schema(description = "The time when the ride completed", type = "string", format = "date-time", example = "2019-10-30T12:34:23Z")
 	private String endTime;
 	
 	@JsonProperty(value = "rideCharges", required = false)
