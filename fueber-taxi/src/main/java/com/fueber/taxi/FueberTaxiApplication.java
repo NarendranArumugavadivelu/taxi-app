@@ -13,6 +13,10 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import com.fueber.taxi.util.FueberTaxiUtils;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+
 @SpringBootApplication
 public class FueberTaxiApplication extends SpringBootServletInitializer {
 
@@ -44,4 +48,9 @@ public class FueberTaxiApplication extends SpringBootServletInitializer {
 	public Properties getErrorProperties() {
 		return FueberTaxiUtils.loadProperties("error-messages.properties");
 	}
+	
+	@Bean
+    public OpenAPI openAPI() {
+		return new OpenAPI().components(new Components()).info(new Info().version("1.0.0").title("Fueber Taxi Booking Application"));
+    }
 }
