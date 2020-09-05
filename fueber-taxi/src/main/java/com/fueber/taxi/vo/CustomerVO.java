@@ -38,6 +38,12 @@ public class CustomerVO {
 	@JsonProperty(value = "taxiId", required = false)
 	private String taxiId;
 	
+	@JsonProperty(value = "distance", required = false)
+	private int distance;
+	
+	@JsonProperty(value = "status", required = false)
+	private String rideStatus;
+	
 	public String getMobileNumber() {
 		return mobileNumber;
 	}
@@ -94,11 +100,28 @@ public class CustomerVO {
 		this.taxiId = taxiId;
 	}
 
+	public int getDistance() {
+		return distance;
+	}
+
+	public void setDistance(int distance) {
+		this.distance = distance;
+	}
+
+	public String getRideStatus() {
+		return rideStatus;
+	}
+
+	public void setRideStatus(String rideStatus) {
+		this.rideStatus = rideStatus;
+	}
+
 	@Override
 	public String toString() {
 		return "CustomerVO [mobileNumber=" + mobileNumber + ", pickupLatitude=" + pickupLatitude + ", pickupLongitude="
 				+ pickupLongitude + ", dropLatitude=" + dropLatitude + ", dropLongitude=" + dropLongitude
-				+ ", isPinkTaxi=" + isPinkTaxi + ", taxiId=" + taxiId + "]";
+				+ ", isPinkTaxi=" + isPinkTaxi + ", taxiId=" + taxiId + ", distance=" + distance + ", rideStatus="
+				+ rideStatus + "]";
 	}
 
 }

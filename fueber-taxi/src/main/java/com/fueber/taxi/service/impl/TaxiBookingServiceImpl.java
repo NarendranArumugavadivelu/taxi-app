@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.fueber.taxi.common.Constants;
 import com.fueber.taxi.dto.CustomerDTO;
 import com.fueber.taxi.dto.TaxiDTO;
+import com.fueber.taxi.enums.RideStatus;
 import com.fueber.taxi.exception.TaxiServiceException;
 import com.fueber.taxi.service.TaxiBookingService;
 import com.fueber.taxi.service.TaxiBookingValidationService;
@@ -45,6 +46,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 			updateTaxiDTO(nearByTaxiDTO, true);
 			CustomerDTO customerDTO = getCustomerDTOByVO(customerVO);
 			customerDTO.setTaxiID(nearByTaxiDTO.getTaxiID());
+			customerDTO.setStatus(RideStatus.BOOKED.getStatus());
 			onRideCustomerList.add(customerDTO);
 			return getCustomerVOByDTO(customerDTO);
 		} else {
@@ -89,7 +91,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 		customerDTO.setPickupLongitude(customerVO.getPickupLongitude());
 		customerDTO.setPinkTaxi(customerVO.isPinkTaxi());
 		int distanceToBeCovered = FueberTaxiUtils.getDistanceBetweenPoints(customerVO.getPickupLatitude(), customerVO.getPickupLongitude(), customerVO.getDropLatitude(), customerVO.getDropLongitude());
-		customerDTO.setDistanceInKms(distanceToBeCovered);
+		customerDTO.setDistance(distanceToBeCovered);
 		return customerDTO;
 	}
 	
@@ -103,6 +105,8 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 		customerVO.setPickupLongitude(customerDTO.getPickupLongitude());
 		customerVO.setPinkTaxi(customerDTO.isPinkTaxi());
 		customerVO.setTaxiId(customerDTO.getTaxiID());
+		customerVO.setDistance(customerDTO.getDistance());
+		customerVO.setRideStatus(customerDTO.getStatus());
 		return customerVO;
 	}
 }

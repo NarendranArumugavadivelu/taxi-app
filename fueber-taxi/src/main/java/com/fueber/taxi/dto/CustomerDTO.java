@@ -18,11 +18,13 @@ public class CustomerDTO {
 	
 	private boolean isPinkTaxi;
 	
-	private int distanceInKms;
+	private int distance;
 	
 	private LocalDateTime startTime;
 	
 	private LocalDateTime endTime;
+	
+	private String status;
 
 	public String getCustomerMobileNumber() {
 		return customerMobileNumber;
@@ -80,12 +82,12 @@ public class CustomerDTO {
 		this.isPinkTaxi = isPinkTaxi;
 	}
 
-	public int getDistanceInKms() {
-		return distanceInKms;
+	public int getDistance() {
+		return distance;
 	}
 
-	public void setDistanceInKms(int distanceInKms) {
-		this.distanceInKms = distanceInKms;
+	public void setDistance(int distance) {
+		this.distance = distance;
 	}
 
 	public LocalDateTime getStartTime() {
@@ -103,13 +105,21 @@ public class CustomerDTO {
 	public void setEndTime(LocalDateTime endTime) {
 		this.endTime = endTime;
 	}
+	
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
 	@Override
 	public String toString() {
 		return "CustomerDTO [customerMobileNumber=" + customerMobileNumber + ", pickupLatitude=" + pickupLatitude
 				+ ", pickupLongitude=" + pickupLongitude + ", dropLatitude=" + dropLatitude + ", dropLongitude="
 				+ dropLongitude + ", taxiID=" + taxiID + ", isPinkTaxi=" + isPinkTaxi + ", distanceInKms="
-				+ distanceInKms + ", startTime=" + startTime + ", endTime=" + endTime + "]";
+				+ distance + ", startTime=" + startTime + ", endTime=" + endTime + "]";
 	}
 
 }
