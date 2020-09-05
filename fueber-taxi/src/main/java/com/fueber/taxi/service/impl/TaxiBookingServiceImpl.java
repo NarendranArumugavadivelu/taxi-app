@@ -41,7 +41,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 		taxiBookingValidationService.validateCustomerOnRideAlready(customerVO.getMobileNumber(), onRideCustomerList);
 		taxiBookingValidationService.validateCustomerPickupLocation(customerVO.getPickupLatitude(), customerVO.getPickupLongitude());
 		taxiBookingValidationService.validateCustomerDropLocation(customerVO.getDropLatitude(), customerVO.getDropLongitude());
-		TaxiDTO nearByTaxiDTO = getNearestTaxi(customerVO.getPickupLatitude(), customerVO.getPickupLongitude());
+		TaxiDTO nearByTaxiDTO = getNearestTaxi(customerVO.getPickupLatitude(), customerVO.getPickupLongitude(), customerVO.isPinkTaxi());
 		if(nearByTaxiDTO != null) {
 			updateTaxiDTO(nearByTaxiDTO, true);
 			CustomerDTO customerDTO = getCustomerDTOByVO(customerVO);
@@ -59,12 +59,12 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 	}
 	
 	/**Method to get the nearest taxi by customer pickup location*/
-	private TaxiDTO getNearestTaxi(double pickupLatitude, double pickLongitude) {
+	private TaxiDTO getNearestTaxi(double pickupLatitude, double pickLongitude, boolean isPinkTaxi) {
 		TaxiDTO nearByTaxiDTO = null;
 		int nearestTaxiDistance = Integer.parseInt(baseKilometerLimit) + 1; //Search is within base kilometer + 1
 		for(TaxiDTO taxiDTO : availableTaxiList) {
 			int distanceBetweenTwoPoints = FueberTaxiUtils.getDistanceBetweenPoints(pickupLatitude, pickLongitude, taxiDTO.getLatitude(), taxiDTO.getLongitude());
-			if(distanceBetweenTwoPoints < nearestTaxiDistance && !taxiDTO.isAssignedToCustomer()) {
+			if(distanceBetweenTwoPoints < nearestTaxiDistance && !taxiDTO.isAssignedToCustomer() && String.valueOf(isPinkTaxi).equalsIgnoreCase(String.valueOf(taxiDTO.isPinkTaxi()))) {
 				nearByTaxiDTO = taxiDTO;
 				nearestTaxiDistance = distanceBetweenTwoPoints;
 			}
