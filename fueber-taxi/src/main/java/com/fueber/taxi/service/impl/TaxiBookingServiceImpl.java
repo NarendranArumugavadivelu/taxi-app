@@ -54,7 +54,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 		taxiBookingValidationService.validateCustomerDropLocation(customerVO.getDropLatitude(), customerVO.getDropLongitude());
 		TaxiDTO nearByTaxiDTO = getNearestTaxi(customerVO.getPickupLatitude(), customerVO.getPickupLongitude(), customerVO.isPinkTaxi());
 		if(nearByTaxiDTO != null) {
-			updateTaxiDTO(nearByTaxiDTO.getTaxiID(), true);
+			updateTaxiDTO(nearByTaxiDTO.getTaxiID(), true, nearByTaxiDTO.getLatitude(), nearByTaxiDTO.getLongitude());
 			CustomerDTO customerDTO = getCustomerDTOByVO(customerVO);
 			customerDTO.setTaxiID(nearByTaxiDTO.getTaxiID());
 			customerDTO.setStatus(RideStatus.BOOKED.getStatus());
@@ -82,10 +82,10 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 			customerDTO.setStartTime(LocalDateTime.now());
 		} else if(RideStatus.CANCELED.getStatus().equalsIgnoreCase(customerVO.getRideStatus())) {
 			taxiBookingValidationService.validateCancelRide(customerVO.getRideStatus(), customerDTO.getStatus());
-			updateTaxiDTO(customerDTO.getTaxiID(), false);
+			updateTaxiDTO(customerDTO.getTaxiID(), false, customerDTO.getDropLatitude(), customerDTO.getDropLongitude());
 		} else if(RideStatus.COMPLETED.getStatus().equalsIgnoreCase(customerVO.getRideStatus())) {
 			taxiBookingValidationService.validateCompleteRide(customerVO.getRideStatus(), customerDTO.getStatus());
-			updateTaxiDTO(customerDTO.getTaxiID(), false);
+			updateTaxiDTO(customerDTO.getTaxiID(), false, customerDTO.getDropLatitude(), customerDTO.getDropLongitude());
 			customerDTO.setEndTime(LocalDateTime.now());
 			int rideInMinutes = (int)Duration.between(customerDTO.getEndTime(), customerDTO.getStartTime()).toMinutes();
 			int rideCharges = (rideInMinutes * Integer.parseInt(baseRatePerMinute)) + (customerDTO.getDistance() * Integer.parseInt(baseRatePerKilometer));
@@ -126,10 +126,14 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 	}
 	
 	/**Method to update the taxi by assigning to customer or free the taxi*/
-	private void updateTaxiDTO(String taxiID, boolean isAssignedToCustomer) {
+	private void updateTaxiDTO(String taxiID, boolean isAssignedToCustomer, double latitude, double longitude) {
 		for(TaxiDTO availableTaxiDTO : availableTaxiList) {
 			if(availableTaxiDTO.getTaxiID().equalsIgnoreCase(taxiID)) {
 				availableTaxiDTO.setAssignedToCustomer(isAssignedToCustomer);
+				if(!isAssignedToCustomer) {
+					availableTaxiDTO.setLatitude(latitude);
+					availableTaxiDTO.setLongitude(longitude);
+				}
 			}
 		}
 	}
