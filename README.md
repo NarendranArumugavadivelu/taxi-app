@@ -15,7 +15,7 @@ How to build and run the applications
 1. Eclipse IDE: Import the project into eclipse and run the project as maven build with the command "package".
                 After the successful build, navigate to target directory and run the jar using "java -jar fueber-taxi.jar". The application would start at port 8080
 				
-2. Start_Simple.sh: Run this script which will do maven package and start the application at localhost at port 8080.
+2. Start.sh: Run this script which will do maven package and start the application at localhost at port 8080.
 
 API Documenttation: Once the application is succesfully started, type the URL "http://localhost:8080/swagger-ui.html" and refer the API documentation.
 
