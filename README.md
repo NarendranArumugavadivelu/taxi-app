@@ -8,7 +8,7 @@ Technologies Used
 -- HTML
 
 Implementation and Assumptions: We own a Fueber taxi service and our office is located at the coordinates (12.976143,77.570541) in Bangalore. 
-                                We provide services only around 25 kilometers from our the former mentioned coordinates with only 10 taxi (5: White and 5: Pink)
+                                We provide services only around 25 kilometers from the former mentioned coordinates with only 10 taxi (5: White and 5: Pink)
                                 The kilometer limit shall be increased
 
 How to build and run the applications
@@ -17,7 +17,7 @@ How to build and run the applications
 				
 2. Start.sh: Run this script which will do maven package and start the application at localhost at port 8080.
 
-API Documenttation: Once the application is succesfully started, type the URL "http://localhost:8080/swagger-ui.html" and refer the API documentation.
+API Documenttation: Once the application is succesfully started, type the URL "http://localhost:8080/swagger-ui.html" and refer the API documentation to book a taxi ride.
 
 HTML Page to View the Available Taxi: In the static folder of the project, there is a TaxiList.html. Kindly run this HTML to view the list of available taxi. Kindly make sure the applicaiton is running.
 
