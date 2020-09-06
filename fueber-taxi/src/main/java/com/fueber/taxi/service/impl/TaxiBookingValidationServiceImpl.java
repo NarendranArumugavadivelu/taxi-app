@@ -86,7 +86,7 @@ public class TaxiBookingValidationServiceImpl implements TaxiBookingValidationSe
 	@Override
 	public void validateStartRide(String status, String currentStatus) throws TaxiServiceException {
 		if(currentStatus.equalsIgnoreCase(RideStatus.COMPLETED.getStatus()) || currentStatus.equalsIgnoreCase(RideStatus.CANCELED.getStatus())) {
-			throwTaxiServiceException(Constants.RIDE_STATUS_CANNOT_BE_UPDATED, status, currentStatus);
+			throwTaxiServiceException(Constants.RIDE_STATUS_CANNOT_BE_UPDATED, currentStatus, status);
 		}
 	}
 
@@ -95,16 +95,16 @@ public class TaxiBookingValidationServiceImpl implements TaxiBookingValidationSe
 		if(RideStatus.STARTED.getStatus().equalsIgnoreCase(currentStatus)) {
 			throwTaxiServiceException(Constants.RIDE_ALREADY_STARTED);
 		} else if(currentStatus.equalsIgnoreCase(RideStatus.COMPLETED.getStatus())) {
-			throwTaxiServiceException(Constants.RIDE_STATUS_CANNOT_BE_UPDATED, status, currentStatus);
+			throwTaxiServiceException(Constants.RIDE_STATUS_CANNOT_BE_UPDATED, currentStatus, status);
 		}
 	}
 
 	@Override
 	public void validateCompleteRide(String status, String currentStatus) throws TaxiServiceException {
-		if(!RideStatus.STARTED.getStatus().equalsIgnoreCase(currentStatus)) {
+		if(currentStatus.equalsIgnoreCase(RideStatus.CANCELED.getStatus())) {
+			throwTaxiServiceException(Constants.RIDE_STATUS_CANNOT_BE_UPDATED, currentStatus, status);
+		} else if(!RideStatus.STARTED.getStatus().equalsIgnoreCase(currentStatus)) {
 			throwTaxiServiceException(Constants.RIDE_NOT_STARTED_YET);
-		} else if(currentStatus.equalsIgnoreCase(RideStatus.CANCELED.getStatus())) {
-			throwTaxiServiceException(Constants.RIDE_STATUS_CANNOT_BE_UPDATED, status, currentStatus);
 		} 
 	}
 }

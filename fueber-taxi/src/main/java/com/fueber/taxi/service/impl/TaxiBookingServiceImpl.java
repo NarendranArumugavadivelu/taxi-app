@@ -141,6 +141,7 @@ public class TaxiBookingServiceImpl implements TaxiBookingService {
 					availableTaxiDTO.setLatitude(latitude);
 					availableTaxiDTO.setLongitude(longitude);
 				}
+				break;
 			}
 		}
 	}
