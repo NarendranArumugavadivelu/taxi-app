@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>Fueber Taxi</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+		<script>
+			function getTaxiDetails() {
+				var xmlhttp = new XMLHttpRequest();
+				xmlhttp.open("GET", "http://localhost:8080/taxi", true);
+				xmlhttp.onreadystatechange = function() 
+				{
+				    if (this.readyState == 4 && this.status == 200)  {
+				        var taxiList = JSON.parse(this.responseText);
+				        var taxiDetailsHTML = getTaxiDetailsHTML(taxiList);
+				        document.getElementById("taxiListBody").innerHTML = taxiDetailsHTML;
+				    }
+				};
+				xmlhttp.send();
+			}
+			
+			function getTaxiDetailsHTML(taxiList) {
+				var taxiDetailsHTML = "";
+				if(taxiList.length == 0) {
+					taxiDetailsHTML = "<tr><td colspan='4' align='center'>No records available.</td></tr>"
+				} else {
+					for(taxi in taxiList) {
+						var color = taxiList[taxi].pinkTaxi ? "Pink" : "White";;
+						taxiDetailsHTML += "<tr>";
+						taxiDetailsHTML += "<td>" + taxiList[taxi].taxiID + "</td>";
+						taxiDetailsHTML += "<td>" + taxiList[taxi].latitude + "</td>";
+						taxiDetailsHTML += "<td>" + taxiList[taxi].longitude + "</td>";
+						taxiDetailsHTML += "<td>" + color + "</td>";
+						taxiDetailsHTML += "</tr>";
+					}
+				}
+				return taxiDetailsHTML;
+			}
+		</script>
+	</head>
+	<body onload="getTaxiDetails()">
+		<div id = "taxiList">
+			<table class="table" id = "taxiListTable">
+				<thead>
+				    <tr>
+				      <th scope="col">Taxi Registration</th>
+				      <th scope="col">Latitude</th>
+				      <th scope="col">Longitude</th>
+				      <th scope="col">Type</th>
+				    </tr>
+  				</thead>
+  				<tbody id = "taxiListBody">
+   					<tr>
+   						<td colspan="4" align="center">No records available.</td>
+   					</tr>
+			</table>
+		</div>
+	</body>
+</html>
