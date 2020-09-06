@@ -19,7 +19,7 @@ How to build and run the applications
 
 API Documenttation: Once the application is succesfully started, type the URL "http://localhost:8080/swagger-ui.html" and refer the API documentation.
 
-HTML Page to View the Available Taxi: In the static folder of the project, there is a TaxiList.html. Kindly run this HTML to view the list of available taxi.
+HTML Page to View the Available Taxi: In the static folder of the project, there is a TaxiList.html. Kindly run this HTML to view the list of available taxi. Kindly make sure the applicaiton is running.
 
 Validations: 
 1. Customer pickup and drop coordinates are validated whether the location lies within in the 25 kilometer limit.
